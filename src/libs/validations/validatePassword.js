@@ -1,76 +1,53 @@
 // @ts-check
 
-/**
- * @typedef {Object} ValidationReturnType
- * @property {boolean} hasError
- * @property {string} errorMessage
- */
-
-import ValidationLength from '../../consts/validationLength';
-import validationMessage from '../../consts/validationMessage';
-import ValidationRegex from '../../consts/validationRegex';
-import checkStringType from '../checkTypes/checkStringType';
-import handleValidation from '../validations/handleValidation';
-import trimAndGetStringLength from '../validations/trimAndGetStringLength';
+import VALID_LENGTH from '../../consts/validation/validLength.js';
+import VALID_MSG from '../../consts/validation/validMessage.js';
+import VALID_REGEX from '../../consts/validation/validRegex.js';
+import checkStringType from '../checkTypes/checkStringType.js';
+import handleValidation from './handleValidation.js';
+import trimAndGetStringLength from './trimAndGetStringLength.js';
 
 /**
  * @function validatePassword
- * @description - This function validates the provided password by checking:
- * 	- Its length must fall within the min and max lengths defined in ValidationLength.
- * 	- It must contains at least one uppercase letter.
- * 	- It must contains at least one lowercase letter.
- * 	- It must contains at least one number.
- * 	- It must contains at least one symbol.
- * @param {string} value - The input string to be validated as a password.
- * @returns {ValidationReturnType} - The validation result.
- * @throws {Error} If the provided value is not a string.
+ * @param {string} value
+ * @returns {{hasError: boolean, errorMessage: string}}
+ * @throws {TypeError}
  */
 function validatePassword(value) {
-	checkStringType(value);
+  checkStringType(value);
 
-	const { trimmedValue, valueLen } = trimAndGetStringLength(value);
+  const { trimmedValue, valueLen } = trimAndGetStringLength(value);
 
-	const { LENGTH_PASSWORD_MIN, LENGTH_PASSWORD_MAX } = ValidationLength;
-	const {
-		MSG_PASSWORD_LENGTH,
-		MSG_PASSWORD_UPPERCASE,
-		MSG_PASSWORD_LOWERCASE,
-		MSG_PASSWORD_NUMBER,
-		MSG_PASSWORD_SYMBOL,
-		MSG_PASSWORD_EMPTY,
-	} = validationMessage;
-	const {
-		REGEX_PASSWORD_UPPERCASE,
-		REGEX_PASSWORD_LOWERCASE,
-		REGEX_PASSWORD_NUMBER,
-		REGEX_PASSWORD_SYMBOL,
-	} = ValidationRegex;
+  if (trimmedValue === '') {
+    return handleValidation(true, VALID_MSG.REQUIRED);
+  }
 
-	if (trimmedValue === '') {
-		return handleValidation(true, MSG_PASSWORD_EMPTY);
-	}
+  if (
+    !(
+      valueLen >= VALID_LENGTH.PASSWORD_MIN &&
+      valueLen <= VALID_LENGTH.PASSWORD_MAX
+    )
+  ) {
+    return handleValidation(true, VALID_MSG.PASSWORD_LENGTH);
+  }
 
-	if (!(valueLen >= LENGTH_PASSWORD_MIN && valueLen <= LENGTH_PASSWORD_MAX)) {
-		return handleValidation(true, MSG_PASSWORD_LENGTH);
-	}
+  if (!VALID_REGEX.PASSWORD_UPPERCASE.test(trimmedValue)) {
+    return handleValidation(true, VALID_MSG.PASSWORD_UPPERCASE);
+  }
 
-	if (!REGEX_PASSWORD_UPPERCASE.test(trimmedValue)) {
-		return handleValidation(true, MSG_PASSWORD_UPPERCASE);
-	}
+  if (!VALID_REGEX.PASSWORD_LOWERCASE.test(trimmedValue)) {
+    return handleValidation(true, VALID_MSG.PASSWORD_LOWERCASE);
+  }
 
-	if (!REGEX_PASSWORD_LOWERCASE.test(trimmedValue)) {
-		return handleValidation(true, MSG_PASSWORD_LOWERCASE);
-	}
+  if (!VALID_REGEX.PASSWORD_NUMBER.test(trimmedValue)) {
+    return handleValidation(true, VALID_MSG.PASSWORD_NUMBER);
+  }
 
-	if (!REGEX_PASSWORD_NUMBER.test(trimmedValue)) {
-		return handleValidation(true, MSG_PASSWORD_NUMBER);
-	}
+  if (!VALID_REGEX.PASSWORD_SYMBOL.test(trimmedValue)) {
+    return handleValidation(true, VALID_MSG.PASSWORD_SYMBOL);
+  }
 
-	if (!REGEX_PASSWORD_SYMBOL.test(trimmedValue)) {
-		return handleValidation(true, MSG_PASSWORD_SYMBOL);
-	}
-
-	return handleValidation(false, '');
+  return handleValidation(false, '');
 }
 
 export default validatePassword;

@@ -1,59 +1,48 @@
 // @ts-check
 
-/**
- * @typedef {Object} ValidationReturnType
- * @property {boolean} hasError
- * @property {string} errorMessage
- */
-
-import ValidationLength from '../../consts/validationLength';
-import validationMessage from '../../consts/validationMessage';
-import ValidationRegex from '../../consts/validationRegex';
-import checkStringType from '../checkTypes/checkStringType';
-import handleValidation from '../validations/handleValidation';
-import trimAndGetStringLength from '../validations/trimAndGetStringLength';
+import VALID_LENGTH from '../../consts/validation/validLength.js';
+import VALID_MSG from '../../consts/validation/validMessage.js';
+import VALID_REGEX from '../../consts/validation/validRegex.js';
+import checkStringType from '../checkTypes/checkStringType.js';
+import handleValidation from './handleValidation.js';
+import trimAndGetStringLength from './trimAndGetStringLength.js';
 
 /**
  * @function validateLastName
- * @description - This function validates the provided last name by checking:
- *  - It must not be an empty string after trimming.
- * 	- Its length must fall within the min and max lengths defined in ValidationLength.
- * 	- It must not contain invalid characters as defined by the REGEX_NAME_INVALID_CHAR pattern.
- * 	- It must not contain consecutive spaces.
- * @param {string} value - The input string to be validated as a last name.
- * @returns {ValidationReturnType} The validation result.
- * @throws {Error} If the provided value is not a string.
+ * @param {string} value
+ * @returns {{hasError: boolean, errorMessage: string}}
+ * @throws {TypeError}
  */
 function validateLastName(value) {
-	checkStringType(value);
+  checkStringType(value);
 
-	const { trimmedValue, valueLen } = trimAndGetStringLength(value);
+  const { trimmedValue, valueLen } = trimAndGetStringLength(value);
 
-	const { LENGTH_LASTNAME_MIN, LENGTH_LASTNAME_MAX } = ValidationLength;
-	const { MSG_LASTNAME_LENGTH, MSG_NAME_INVALID_SYMBOL, MSG_CONSECUTIVE_SPACES } =
-		validationMessage;
-	const { REGEX_NAME_INVALID_CHAR } = ValidationRegex;
+  if (valueLen === 0) {
+    return handleValidation(false, '');
+  }
 
-	if (valueLen === 0) {
-		return handleValidation(false, '');
-	}
+  if (
+    !(valueLen >= VALID_LENGTH.NAME_MIN && valueLen <= VALID_LENGTH.NAME_MAX)
+  ) {
+    return handleValidation(true, VALID_MSG.NAME_LENGTH);
+  }
 
-	if (!(valueLen >= LENGTH_LASTNAME_MIN && valueLen <= LENGTH_LASTNAME_MAX)) {
-		return handleValidation(true, MSG_LASTNAME_LENGTH);
-	}
+  const invalidCharCount = (
+    trimmedValue.match(VALID_REGEX.NAME_INVALID_CHAR) || []
+  ).length;
 
-	const invalidCharCount = (trimmedValue.match(REGEX_NAME_INVALID_CHAR) || []).length;
-	const consecutiveSpaces = trimmedValue.includes('  ');
+  const consecutiveSpaces = trimmedValue.includes('  ');
 
-	if (invalidCharCount > 0) {
-		return handleValidation(true, MSG_NAME_INVALID_SYMBOL);
-	}
+  if (invalidCharCount > 0) {
+    return handleValidation(true, VALID_MSG.INVALID_SYMBOL);
+  }
 
-	if (consecutiveSpaces) {
-		return handleValidation(true, MSG_CONSECUTIVE_SPACES);
-	}
+  if (consecutiveSpaces) {
+    return handleValidation(true, VALID_MSG.CONSECUTIVE_SPACES);
+  }
 
-	return handleValidation(false, '');
+  return handleValidation(false, '');
 }
 
 export default validateLastName;

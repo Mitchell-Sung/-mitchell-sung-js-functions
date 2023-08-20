@@ -2,7 +2,6 @@
 
 /**
  * @function checkBoolType
- * @description
  * @param {...*} values
  * @returns {void}
  * @throws {TypeError}

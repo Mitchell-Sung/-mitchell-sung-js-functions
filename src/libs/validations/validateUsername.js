@@ -6,54 +6,52 @@
  * @property {string} errorMessage
  */
 
-import ValidationLength from '../../consts/validationLength';
-import validationMessage from '../../consts/validationMessage';
-import ValidationRegex from '../../consts/validationRegex';
-import checkStringType from '../checkTypes/checkStringType';
-import handleValidation from '../validations/handleValidation';
-import trimAndGetStringLength from '../validations/trimAndGetStringLength';
+import VALID_LENGTH from '../../consts/validation/validLength.js';
+import VALID_REGEX from '../../consts/validation/validRegex.js';
+import VALID_MSG from '../../consts/validation/validMessage.js';
+import checkStringType from '../checkTypes/checkStringType.js';
+import handleValidation from './handleValidation.js';
+import trimAndGetStringLength from './trimAndGetStringLength.js';
 
 /**
  * @function validateUsername
- * @description - This function validates the provided password by checking:
- *  - It must be a string.
- *  - It should not be an empty string after trimming white spaces.
- *  - Its length must be within a predefined minimum and maximum length.
- *  - It should not contain any invalid characters as defined by a regular expression.
- *  - It should not contain any spaces.
- * @param {string} value - The input string to be validated as an username.
- * @returns {ValidationReturnType} - The validation result.
- * @throws {Error} If the provided value is not a string.
+ * @param {string} value
+ * @returns {{hasError: boolean, errorMessage: string}}
+ * @throws {TypeError}
  */
 function validateUsername(value) {
-	checkStringType(value);
+  checkStringType(value);
 
-	const { trimmedValue, valueLen } = trimAndGetStringLength(value);
+  const { trimmedValue, valueLen } = trimAndGetStringLength(value);
 
-	const { LENGTH_USERNAME_MIN, LENGTH_USERNAME_MAX } = ValidationLength;
-	const { MSG_USERNAME_LENGTH, MSG_USERNAME_SYMBOL, MSG_USERNAME_SPACE } = validationMessage;
-	const { REGEX_USERNAME_INVALID_CHAR, REGEX_SPACE } = ValidationRegex;
+  if (valueLen === 0) {
+    return handleValidation(false, '');
+  }
 
-	if (valueLen === 0) {
-		return handleValidation(false, '');
-	}
+  if (
+    !(
+      valueLen >= VALID_LENGTH.USERNAME_MIN &&
+      valueLen <= VALID_LENGTH.USERNAME_MAX
+    )
+  ) {
+    return handleValidation(true, VALID_MSG.USERNAME_LENGTH);
+  }
 
-	if (!(valueLen >= LENGTH_USERNAME_MIN && valueLen <= LENGTH_USERNAME_MAX)) {
-		return handleValidation(true, MSG_USERNAME_LENGTH);
-	}
+  const invalidCharCount = (
+    trimmedValue.match(VALID_REGEX.USERNAME_INVALID_CHAR) || []
+  ).length;
 
-	const invalidCharCount = (trimmedValue.match(REGEX_USERNAME_INVALID_CHAR) || []).length;
-	const spaceCount = (trimmedValue.match(REGEX_SPACE) || []).length;
+  const spaceCount = (trimmedValue.match(VALID_REGEX.SPACE) || []).length;
 
-	if (invalidCharCount > 0) {
-		return handleValidation(true, MSG_USERNAME_SYMBOL);
-	}
+  if (invalidCharCount > 0) {
+    return handleValidation(true, VALID_MSG.USERNAME_SYMBOL);
+  }
 
-	if (spaceCount > 0) {
-		return handleValidation(true, MSG_USERNAME_SPACE);
-	}
+  if (spaceCount > 0) {
+    return handleValidation(true, VALID_MSG.USERNAME_SPACE);
+  }
 
-	return handleValidation(false, '');
+  return handleValidation(false, '');
 }
 
 export default validateUsername;

@@ -1,6 +1,6 @@
 // @ts-check
 
-import VALID_LENGTH from './validLength';
+import VALID_LENGTH from './validLength.js';
 
 /**
  * @const VALID_MSG
