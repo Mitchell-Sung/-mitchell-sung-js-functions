@@ -1,6 +1,6 @@
 {
   "name": "@mitchell-sung/functions",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Shared functions for MitchellApps by Mitchell Sung",
   "main": "index.js",
   "type": "module",
