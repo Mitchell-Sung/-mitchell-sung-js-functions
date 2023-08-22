@@ -24,7 +24,7 @@ const func_name = () => {
 ```
 
 ```javascript
-var { VALID_MSG } = require('@sds-stream/function-validations');
+var { VALID_MSG } = require('@mitchell-sung/functions');
 
 function func_name() {
 	console.log(VALID_MSG.SELECTOR_REQUIRED);
