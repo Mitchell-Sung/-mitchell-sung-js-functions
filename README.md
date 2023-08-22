@@ -1,4 +1,4 @@
-# @sds-stream/function-validations
+# @mitchell-sung/functions
 
 The <code>@mitchell-sung/functions</code> library provides developers with an all-encompassing suite of functions.
 
